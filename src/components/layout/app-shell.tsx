@@ -5,6 +5,7 @@ import { useAuth } from '@/context/auth-context';
 import { ModuleIcon } from '@/components/ui/icon';
 import { MtandtLogo } from '@/components/ui/mtandt-logo';
 import { BrandBackground } from '@/components/layout/brand-background';
+import { AppFooter } from '@/components/layout/app-footer';
 import { cn, initials } from '@/lib/utils';
 
 export default function AppShell() {
@@ -42,7 +43,7 @@ export default function AppShell() {
     cn('flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium', isActive ? 'bg-slate-100 text-slate-900' : 'text-slate-600 hover:bg-slate-50');
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative flex min-h-screen flex-col">
       <BrandBackground />
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur">
         <div className="mx-auto flex h-[4.25rem] max-w-7xl items-center gap-3 px-4 sm:gap-5 sm:px-6 2xl:max-w-[110rem]">
@@ -159,9 +160,10 @@ export default function AppShell() {
         )}
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 2xl:max-w-[110rem]">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 2xl:max-w-[110rem]">
         <Outlet />
       </main>
+      <AppFooter />
     </div>
   );
 }
