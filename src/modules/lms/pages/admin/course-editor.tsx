@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff, Save } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Image as ImageIcon, Save } from 'lucide-react';
 import { api } from '@/lib/api';
 import { apiErrorMessage, cn } from '@/lib/utils';
 import { Badge, Button, Card, Input, Label, Select, Spinner, Textarea } from '@/components/ui/primitives';
+import { MtandtLogo } from '@/components/ui/mtandt-logo';
 import { CurriculumBuilder } from './curriculum-builder';
 
 export default function CourseEditor() {
@@ -30,6 +31,13 @@ export default function CourseEditor() {
   const [difficulty, setDifficulty] = useState('BEGINNER');
   const [estimatedMinutes, setEstimatedMinutes] = useState(0);
   const [isFeatured, setIsFeatured] = useState(false);
+  // Cover image: `coverPending` is what we'll save — 'r2:<key>' (uploaded), an external
+  // URL, or '' to clear; `undefined` means "unchanged, don't send". `coverPreview` is
+  // just for display.
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [coverPending, setCoverPending] = useState<string | undefined>(undefined);
+  const [coverBusy, setCoverBusy] = useState(false);
+  const coverFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     api.get('/lms/categories').then((r) => setCategories(r.data.data));
@@ -49,8 +57,28 @@ export default function CourseEditor() {
       setDifficulty(c.difficulty);
       setEstimatedMinutes(c.estimatedMinutes);
       setIsFeatured(c.isFeatured);
+      setCoverPreview(c.thumbnailUrl ?? null);
     }).finally(() => setLoading(false));
   }, [slug]);
+
+  async function onCoverFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCoverBusy(true);
+    setError('');
+    try {
+      const res = await api.post('/media/upload', file, {
+        headers: { 'Content-Type': file.type || 'application/octet-stream', 'X-File-Name': encodeURIComponent(file.name) },
+      });
+      setCoverPending('r2:' + res.data.data.fileKey);
+      setCoverPreview(URL.createObjectURL(file));
+    } catch (err) {
+      setError(apiErrorMessage(err));
+    } finally {
+      setCoverBusy(false);
+      if (coverFileRef.current) coverFileRef.current.value = '';
+    }
+  }
 
   async function saveDetails(e: React.FormEvent) {
     e.preventDefault();
@@ -58,7 +86,16 @@ export default function CourseEditor() {
     setError('');
     setMsg('');
     try {
-      const body = { title, summary: summary || null, description: description || null, categoryId: categoryId || null, difficulty, estimatedMinutes, isFeatured };
+      const body = {
+        title,
+        summary: summary || null,
+        description: description || null,
+        categoryId: categoryId || null,
+        difficulty,
+        estimatedMinutes,
+        isFeatured,
+        ...(coverPending !== undefined ? { thumbnailUrl: coverPending || null } : {}),
+      };
       if (isNew) {
         const res = await api.post('/lms/courses', body);
         const c = res.data.data;
@@ -136,6 +173,37 @@ export default function CourseEditor() {
               <Label>Description</Label>
               <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
             </div>
+
+            <div>
+              <Label>Cover image</Label>
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="grid h-24 w-40 shrink-0 place-items-center overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-br from-blue-500 to-indigo-600">
+                  {coverPreview ? (
+                    <img src={coverPreview} alt="Course cover" className="h-full w-full object-cover" />
+                  ) : (
+                    <MtandtLogo className="h-9 w-auto rounded" />
+                  )}
+                </div>
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
+                  <input ref={coverFileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onCoverFile} />
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" variant="outline" size="sm" loading={coverBusy} onClick={() => coverFileRef.current?.click()}>
+                      <ImageIcon className="h-4 w-4" /> {coverPreview ? 'Replace image' : 'Upload image'}
+                    </Button>
+                    {coverPreview && (
+                      <Button type="button" variant="ghost" size="sm" onClick={() => { setCoverPending(''); setCoverPreview(null); }}>Remove</Button>
+                    )}
+                  </div>
+                  <Input
+                    placeholder="…or paste an image URL"
+                    onChange={(e) => { const v = e.target.value.trim(); setCoverPending(v); setCoverPreview(v || null); }}
+                    className="w-full sm:max-w-sm"
+                  />
+                  <p className="text-xs text-slate-400">Shown on the course card & detail page. PNG/JPG/WebP. If empty, a branded placeholder is used.</p>
+                </div>
+              </div>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-3">
               <div>
                 <Label>Category</Label>

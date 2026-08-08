@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/auth-context';
 import { Badge, Button, Card, Input, Select, Spinner } from '@/components/ui/primitives';
+import { MtandtLogo } from '@/components/ui/mtandt-logo';
 
 interface CourseCard {
   id: string;
@@ -165,8 +166,12 @@ export default function LmsCatalog() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {courses.map((c) => (
             <Link key={c.id} to={`/lms/course/${c.slug}`} className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
-              <div className="flex h-28 items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600">
-                <GraduationCap className="h-10 w-10 text-white/80" />
+              <div className="flex h-28 items-center justify-center overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600">
+                {c.thumbnailUrl ? (
+                  <img src={c.thumbnailUrl} alt={c.title} loading="lazy" className="h-full w-full object-cover" />
+                ) : (
+                  <MtandtLogo className="h-10 w-auto rounded shadow-sm" />
+                )}
               </div>
               <div className="flex flex-1 flex-col p-4">
                 <div className="mb-2 flex items-center gap-2">

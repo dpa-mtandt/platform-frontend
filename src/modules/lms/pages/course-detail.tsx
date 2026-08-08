@@ -22,6 +22,7 @@ interface CourseDetail {
   slug: string;
   summary?: string | null;
   description?: string | null;
+  thumbnailUrl?: string | null;
   difficulty: string;
   estimatedMinutes: number;
   status: string;
@@ -78,8 +79,12 @@ export default function CourseDetail() {
       {/* Hero */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex items-center gap-4 bg-gradient-to-br from-blue-600 to-indigo-700 p-6 text-white">
-          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-white/15">
-            <GraduationCap className="h-7 w-7" />
+          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-white/15">
+            {course.thumbnailUrl ? (
+              <img src={course.thumbnailUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <GraduationCap className="h-7 w-7" />
+            )}
           </div>
           <div>
             <div className="mb-1 flex flex-wrap items-center gap-2">
