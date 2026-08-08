@@ -13,8 +13,6 @@ interface CourseCard {
   slug: string;
   summary?: string | null;
   thumbnailUrl?: string | null;
-  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-  estimatedMinutes: number;
   isFeatured: boolean;
   category?: { id: string; name: string } | null;
   sectionCount: number;
@@ -26,8 +24,6 @@ interface Enrollment {
   progressPercent: number;
   course: { title: string; slug: string; category?: { name: string } | null };
 }
-
-const diffTone = { BEGINNER: 'green', INTERMEDIATE: 'amber', ADVANCED: 'red' } as const;
 
 function ProgressBar({ value }: { value: number }) {
   return (
@@ -175,14 +171,13 @@ export default function LmsCatalog() {
               </div>
               <div className="flex flex-1 flex-col p-4">
                 <div className="mb-2 flex items-center gap-2">
-                  <Badge tone={diffTone[c.difficulty]}>{c.difficulty.toLowerCase()}</Badge>
                   {c.category && <span className="text-xs text-slate-400">{c.category.name}</span>}
                   {c.isFeatured && <Badge tone="violet">featured</Badge>}
                 </div>
                 <h3 className="font-semibold text-slate-900 group-hover:text-blue-700">{c.title}</h3>
                 <p className="mt-1 line-clamp-2 flex-1 text-sm text-slate-500">{c.summary}</p>
                 <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
-                  <span>{c.sectionCount} sections · {c.estimatedMinutes} min</span>
+                  <span>{c.sectionCount} sections</span>
                   {c.myEnrollment && (
                     <Badge tone={c.myEnrollment.status === 'COMPLETED' ? 'green' : 'blue'}>
                       {c.myEnrollment.status === 'COMPLETED' ? 'Completed' : `${Math.round(c.myEnrollment.progressPercent)}%`}

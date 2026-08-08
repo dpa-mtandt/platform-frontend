@@ -29,7 +29,6 @@ interface CourseRow {
   title: string;
   slug: string;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
-  difficulty: string;
   category?: { name: string } | null;
   sectionCount: number;
   enrollmentCount: number;
@@ -116,7 +115,6 @@ export default function ManageCourses() {
                   <tr key={c.id} className="hover:bg-slate-50/50">
                     <td className="px-4 py-3">
                       <div className="font-medium text-slate-900">{c.title}</div>
-                      <div className="text-xs capitalize text-slate-400">{c.difficulty.toLowerCase()}</div>
                     </td>
                     <td className="px-4 py-3"><Badge tone={statusTone[c.status]}>{c.status}</Badge></td>
                     <td className="px-4 py-3 text-slate-600">{c.category?.name ?? '—'}</td>

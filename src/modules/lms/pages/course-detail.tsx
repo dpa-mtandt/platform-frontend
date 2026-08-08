@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Circle, ClipboardCheck, Clock, GraduationCap, Layers, Lock, PlayCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Circle, ClipboardCheck, GraduationCap, Layers, Lock, PlayCircle } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Badge, Button, Card, Spinner } from '@/components/ui/primitives';
 
@@ -23,8 +23,6 @@ interface CourseDetail {
   summary?: string | null;
   description?: string | null;
   thumbnailUrl?: string | null;
-  difficulty: string;
-  estimatedMinutes: number;
   status: string;
   category?: { name: string } | null;
   instructor?: { name: string; designation?: string | null } | null;
@@ -88,7 +86,6 @@ export default function CourseDetail() {
           </div>
           <div>
             <div className="mb-1 flex flex-wrap items-center gap-2">
-              <Badge tone="slate">{course.difficulty.toLowerCase()}</Badge>
               {course.category && <span className="text-xs text-white/70">{course.category.name}</span>}
               {course.status !== 'PUBLISHED' && <Badge tone="amber">{course.status}</Badge>}
             </div>
@@ -99,7 +96,6 @@ export default function CourseDetail() {
 
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-slate-100 px-6 py-4 text-sm text-slate-500">
           <span className="inline-flex items-center gap-1.5"><Layers className="h-4 w-4" /> {course.sections.length} sections · {course.lessonCount} lessons</span>
-          <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" /> {course.estimatedMinutes} min</span>
           {course.instructor && <span>Instructor: {course.instructor.name}</span>}
           <div className="ml-auto">
             <Button onClick={() => navigate(`/lms/learn/${course.slug}`)}>

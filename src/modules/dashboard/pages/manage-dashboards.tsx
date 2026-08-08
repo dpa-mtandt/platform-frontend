@@ -33,7 +33,6 @@ export default function ManageDashboards() {
   const [editing, setEditing] = useState<DashRow | 'new' | null>(null);
   const [assigning, setAssigning] = useState<DashRow | null>(null);
   const [deleting, setDeleting] = useState<DashRow | null>(null);
-  const [status, setStatus] = useState<string>('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -47,12 +46,6 @@ export default function ManageDashboards() {
     void load();
   }, [load]);
 
-  async function testConnection() {
-    setStatus('Checking…');
-    const r = (await api.get('/dashboard/status')).data.data;
-    setStatus(`${r.ok ? '✓' : '•'} Power BI mode: ${r.mode}. ${r.steps.map((s: { detail: string }) => s.detail).join(' ')}`);
-  }
-
   return (
     <div>
       <Link to="/dashboard" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800">
@@ -64,11 +57,9 @@ export default function ManageDashboards() {
           <p className="text-sm text-slate-500">Register Power BI reports and assign who can see each one.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={testConnection}>Test Power BI</Button>
           <Button onClick={() => setEditing('new')}><Plus className="h-4 w-4" /> New dashboard</Button>
         </div>
       </div>
-      {status && <p className="mb-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600 ring-1 ring-slate-200">{status}</p>}
 
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">

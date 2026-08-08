@@ -28,8 +28,6 @@ export default function CourseEditor() {
   const [summary, setSummary] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  const [difficulty, setDifficulty] = useState('BEGINNER');
-  const [estimatedMinutes, setEstimatedMinutes] = useState(0);
   const [isFeatured, setIsFeatured] = useState(false);
   // Cover image: `coverPending` is what we'll save — 'r2:<key>' (uploaded), an external
   // URL, or '' to clear; `undefined` means "unchanged, don't send". `coverPreview` is
@@ -54,8 +52,6 @@ export default function CourseEditor() {
       setSummary(c.summary ?? '');
       setDescription(c.description ?? '');
       setCategoryId(c.categoryId ?? '');
-      setDifficulty(c.difficulty);
-      setEstimatedMinutes(c.estimatedMinutes);
       setIsFeatured(c.isFeatured);
       setCoverPreview(c.thumbnailUrl ?? null);
     }).finally(() => setLoading(false));
@@ -91,8 +87,6 @@ export default function CourseEditor() {
         summary: summary || null,
         description: description || null,
         categoryId: categoryId || null,
-        difficulty,
-        estimatedMinutes,
         isFeatured,
         ...(coverPending !== undefined ? { thumbnailUrl: coverPending || null } : {}),
       };
@@ -204,26 +198,12 @@ export default function CourseEditor() {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div>
-                <Label>Category</Label>
-                <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-                  <option value="">— None —</option>
-                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </Select>
-              </div>
-              <div>
-                <Label>Difficulty</Label>
-                <Select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-                  <option value="BEGINNER">Beginner</option>
-                  <option value="INTERMEDIATE">Intermediate</option>
-                  <option value="ADVANCED">Advanced</option>
-                </Select>
-              </div>
-              <div>
-                <Label>Est. minutes</Label>
-                <Input type="number" min={0} value={estimatedMinutes} onChange={(e) => setEstimatedMinutes(Number(e.target.value))} />
-              </div>
+            <div>
+              <Label>Category</Label>
+              <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+                <option value="">— None —</option>
+                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </Select>
             </div>
             <label className="flex items-center gap-2 text-sm text-slate-700">
               <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="rounded border-slate-300" />
